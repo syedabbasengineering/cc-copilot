@@ -81,11 +81,16 @@ const processEnv: Record<keyof Env, string | undefined> = {
 
 let env: Env;
 
-try {
-  env = envSchema.parse(processEnv);
-} catch (error) {
-  console.error('❌ Invalid environment variables:', error);
-  throw new Error('Invalid environment variables');
+// Skip validation if explicitly requested (useful for builds)
+if (process.env.SKIP_ENV_VALIDATION === 'true') {
+  env = processEnv as Env;
+} else {
+  try {
+    env = envSchema.parse(processEnv);
+  } catch (error) {
+    console.error('❌ Invalid environment variables:', error);
+    throw new Error('Invalid environment variables');
+  }
 }
 
 export { env };
