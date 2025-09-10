@@ -85,80 +85,80 @@ jobs:
       - name: Run security audit
         run: npm audit --audit-level=moderate --workspace=apps/web
 
-  # Deploy to Vercel (only on main branch)
-  deploy-vercel:
-    name: Deploy to Vercel
-    needs: [build-and-test, security-audit]
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # Deploy to Vercel (only on main branch) - DISABLED until secrets are configured
+  # deploy-vercel:
+  #   name: Deploy to Vercel
+  #   needs: [build-and-test, security-audit]
+  #   runs-on: ubuntu-latest
+  #   if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Deploy to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
-          vercel-args: '--prod'
-          working-directory: ./
+  #     - name: Deploy to Vercel
+  #       uses: amondnet/vercel-action@v25
+  #       with:
+  #         vercel-token: ${{ secrets.VERCEL_TOKEN }}
+  #         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+  #         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+  #         vercel-args: '--prod'
+  #         working-directory: ./
 
-  # Preview Deploy (for PRs)
-  deploy-preview:
-    name: Deploy Preview
-    needs: [build-and-test, security-audit]
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  # Preview Deploy (for PRs) - DISABLED until secrets are configured
+  # deploy-preview:
+  #   name: Deploy Preview
+  #   needs: [build-and-test, security-audit]
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Deploy Preview to Vercel
-        uses: amondnet/vercel-action@v25
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }}
-          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
-          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
-          working-directory: ./
+  #     - name: Deploy Preview to Vercel
+  #       uses: amondnet/vercel-action@v25
+  #       with:
+  #         vercel-token: ${{ secrets.VERCEL_TOKEN }}
+  #         vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+  #         vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}}
+  #         working-directory: ./
 
-      - name: Comment PR with Preview URL
-        uses: actions/github-script@v7
-        if: github.event_name == 'pull_request'
-        with:
-          script: |
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
+  #     - name: Comment PR with Preview URL
+  #       uses: actions/github-script@v7
+  #       if: github.event_name == 'pull_request'
+  #       with:
+  #         script: |
+  #           const { data: comments } = await github.rest.issues.listComments({
+  #             owner: context.repo.owner,
+  #             repo: context.repo.repo,
+  #             issue_number: context.issue.number,
+  #           });
             
-            const botComment = comments.find(comment => 
-              comment.user.type === 'Bot' && comment.body.includes('Preview deployment')
-            );
+  #           const botComment = comments.find(comment => 
+  #             comment.user.type === 'Bot' && comment.body.includes('Preview deployment')
+  #           );
             
-            const body = `🚀 **Preview deployment ready!**
+  #           const body = `🚀 **Preview deployment ready!**
             
-            Your changes have been deployed to a preview environment.
+  #           Your changes have been deployed to a preview environment.
             
-            **✅ Build Status:** Successful
-            **🔍 Checks:** All quality checks passed
-            **📱 Preview:** Available on Vercel
+  #           **✅ Build Status:** Successful
+  #           **🔍 Checks:** All quality checks passed
+  #           **📱 Preview:** Available on Vercel
             
-            Please test your changes before merging.`;
+  #           Please test your changes before merging.`;
             
-            if (botComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: botComment.id,
-                body: body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              });
-            }
+  #           if (botComment) {
+  #             await github.rest.issues.updateComment({
+  #               owner: context.repo.owner,
+  #               repo: context.repo.repo,
+  #               comment_id: botComment.id,
+  #               body: body
+  #             });
+  #           } else {
+  #             await github.rest.issues.createComment({
+  #               owner: context.repo.owner,
+  #               repo: context.repo.repo,
+  #               issue_number: context.issue.number,
+  #               body: body
+  #             });
+  #           }
