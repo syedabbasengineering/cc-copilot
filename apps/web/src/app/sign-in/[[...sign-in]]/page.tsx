@@ -1,4 +1,8 @@
 import { SignIn } from '@clerk/nextjs';
+import Link from 'next/link';
+
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic';
 
 export default function SignInPage() {
   return (
@@ -28,10 +32,10 @@ export default function SignInPage() {
         
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
-            Don't have an account?{' '}
-            <a href="/sign-up" className="text-purple-600 hover:text-purple-700 font-medium">
+            Don&apos;t have an account?{' '}
+            <Link href="/sign-up" className="text-purple-600 hover:text-purple-700 font-medium">
               Sign up for free
-            </a>
+            </Link>
           </p>
         </div>
       </div>

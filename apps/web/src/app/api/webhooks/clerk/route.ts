@@ -20,7 +20,6 @@ export async function POST(req: Request) {
 
   // Get the body
   const payload = await req.text();
-  const body = JSON.parse(payload);
 
   // Create a new Svix instance with your secret.
   const wh = new Webhook(process.env.CLERK_WEBHOOK_SECRET || '');
@@ -71,7 +70,13 @@ export async function POST(req: Request) {
 }
 
 async function handleUserCreated(evt: WebhookEvent) {
-  const { id, email_addresses, first_name, last_name, image_url } = evt.data;
+  const data = evt.data as {
+    id: string;
+    email_addresses: Array<{ email_address: string }>;
+    first_name?: string;
+    last_name?: string;
+  };
+  const { id, email_addresses, first_name, last_name } = data;
   
   if (!email_addresses || email_addresses.length === 0) {
     throw new Error('No email address found for user');
@@ -112,7 +117,13 @@ async function handleUserCreated(evt: WebhookEvent) {
 }
 
 async function handleUserUpdated(evt: WebhookEvent) {
-  const { id, email_addresses, first_name, last_name } = evt.data;
+  const data = evt.data as {
+    id: string;
+    email_addresses: Array<{ email_address: string }>;
+    first_name?: string;
+    last_name?: string;
+  };
+  const { id, email_addresses, first_name, last_name } = data;
   
   if (!email_addresses || email_addresses.length === 0) {
     console.warn('No email address found for user update');
@@ -160,7 +171,8 @@ async function handleUserUpdated(evt: WebhookEvent) {
 }
 
 async function handleUserDeleted(evt: WebhookEvent) {
-  const { id } = evt.data;
+  const data = evt.data as { id: string };
+  const { id } = data;
 
   console.log(`Deleting user: ${id}`);
 

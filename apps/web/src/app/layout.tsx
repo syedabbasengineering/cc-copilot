@@ -18,7 +18,11 @@ export const metadata: Metadata = {
   description: "Transform your ideas into high-performing short-form video scripts, hooks, and captions optimized for TikTok, Instagram Reels, and YouTube Shorts.",
   keywords: "AI content creation, TikTok scripts, Instagram Reels, YouTube Shorts, social media content",
   authors: [{ name: "CC Copilot Team" }],
-  viewport: "width=device-width, initial-scale=1",
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({

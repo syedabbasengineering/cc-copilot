@@ -153,7 +153,7 @@ export class DatabasePerformance {
   }
 
   static getAllStats() {
-    const stats: Record<string, any> = {};
+    const stats: Record<string, ReturnType<typeof this.getQueryStats>> = {};
     for (const [queryId] of this.queryTimes) {
       stats[queryId] = this.getQueryStats(queryId);
     }

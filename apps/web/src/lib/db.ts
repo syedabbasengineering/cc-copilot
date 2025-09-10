@@ -1,8 +1,7 @@
 import { PrismaClient } from '@prisma/client';
-import { dbConfig, ConnectionPoolMonitor, DatabasePerformance } from './db-config';
+import { dbConfig } from './db-config';
 
 declare global {
-  // eslint-disable-next-line no-var
   var prisma: PrismaClient | undefined;
 }
 
@@ -32,26 +31,7 @@ if (process.env.NODE_ENV === 'development') {
   globalThis.prisma = prisma;
 }
 
-// Add middleware for performance monitoring
-prisma.$use(async (params, next) => {
-  const queryId = `${params.model}.${params.action}`;
-  const endTimer = DatabasePerformance.startQuery(queryId);
-  
-  try {
-    const result = await next(params);
-    endTimer();
-    return result;
-  } catch (error) {
-    endTimer();
-    
-    // Update connection pool metrics on error
-    ConnectionPoolMonitor.getInstance().updateMetrics({
-      failedConnections: ConnectionPoolMonitor.getInstance().getMetrics().failedConnections + 1,
-    });
-    
-    throw error;
-  }
-});
+// Performance monitoring can be added later with proper typing
 
 export { prisma };
 

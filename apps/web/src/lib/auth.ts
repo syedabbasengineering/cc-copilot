@@ -72,7 +72,12 @@ export async function requireUserWithSubscription(): Promise<UserWithSubscriptio
 }
 
 // Create user in database from Clerk user data
-export async function createUserFromClerk(clerkUser: any): Promise<UserWithSubscription> {
+export async function createUserFromClerk(clerkUser: {
+  id: string;
+  emailAddresses: Array<{ emailAddress: string }>;
+  firstName?: string | null;
+  lastName?: string | null;
+}): Promise<UserWithSubscription> {
   const email = clerkUser.emailAddresses[0]?.emailAddress;
   const name = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || null;
 
