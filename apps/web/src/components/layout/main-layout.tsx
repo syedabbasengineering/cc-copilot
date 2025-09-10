@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+
 import { cn } from '@/lib/utils';
 
 interface MainLayoutProps {
@@ -34,9 +35,7 @@ export function MainLayout({ children, className }: MainLayoutProps) {
               </a>
             </nav>
             <div className="flex items-center space-x-4">
-              <button className="text-sm font-medium hover:text-primary">
-                Settings
-              </button>
+              <button className="text-sm font-medium hover:text-primary">Settings</button>
             </div>
           </div>
         </div>

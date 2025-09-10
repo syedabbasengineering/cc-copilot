@@ -10,6 +10,7 @@ const envSchema = z.object({
   NEXTAUTH_URL: z.string().url().optional(),
   CLERK_SECRET_KEY: z.string().min(1).optional(),
   CLERK_PUBLISHABLE_KEY: z.string().min(1).optional(),
+  CLERK_WEBHOOK_SECRET: z.string().min(1).optional(),
 
   // AI Services
   OPENAI_API_KEY: z.string().min(1),
@@ -56,6 +57,7 @@ const processEnv: Record<keyof Env, string | undefined> = {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
   CLERK_PUBLISHABLE_KEY: process.env.CLERK_PUBLISHABLE_KEY,
+  CLERK_WEBHOOK_SECRET: process.env.CLERK_WEBHOOK_SECRET,
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY,
   WHISPER_API_KEY: process.env.WHISPER_API_KEY,
@@ -79,11 +81,16 @@ const processEnv: Record<keyof Env, string | undefined> = {
 
 let env: Env;
 
-try {
-  env = envSchema.parse(processEnv);
-} catch (error) {
-  console.error('❌ Invalid environment variables:', error);
-  throw new Error('Invalid environment variables');
+// Skip validation if explicitly requested (useful for builds)
+if (process.env.SKIP_ENV_VALIDATION === 'true') {
+  env = processEnv as Env;
+} else {
+  try {
+    env = envSchema.parse(processEnv);
+  } catch (error) {
+    console.error('❌ Invalid environment variables:', error);
+    throw new Error('Invalid environment variables');
+  }
 }
 
 export { env };

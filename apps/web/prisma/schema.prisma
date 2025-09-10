@@ -1,0 +1,329 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// User and Authentication Models
+model User {
+  id                  String             @id @default(cuid())
+  email               String             @unique
+  name                String?
+  brandVoice          String?            @map("brand_voice")
+  preferredPlatforms  Platform[]         @map("preferred_platforms")
+  subscriptionStatus  SubscriptionStatus @default(FREE_TRIAL) @map("subscription_status")
+  subscriptionEndsAt  DateTime?          @map("subscription_ends_at")
+  trialStartedAt      DateTime           @default(now()) @map("trial_started_at")
+  
+  // Usage tracking
+  monthlyIdeas        Int                @default(0) @map("monthly_ideas")
+  monthlyGenerations  Int                @default(0) @map("monthly_generations")
+  lastResetAt         DateTime           @default(now()) @map("last_reset_at")
+  
+  // Metadata
+  createdAt           DateTime           @default(now()) @map("created_at")
+  updatedAt           DateTime           @updatedAt @map("updated_at")
+  
+  // Relations
+  ideas               Idea[]
+  generatedContent    GeneratedContent[]
+  performanceData     PerformanceData[]
+  userSettings        UserSettings?
+  subscription        Subscription?
+  analytics           UserAnalytics[]
+  ownedTeams          Team[]           @relation("TeamOwner")
+  teamMemberships     TeamMember[]     @relation("TeamMembership")
+  
+  @@map("users")
+}
+
+model UserSettings {
+  id                 String      @id @default(cuid())
+  userId             String      @unique @map("user_id")
+  defaultTone        ContentTone @default(FRIENDLY) @map("default_tone")
+  autoSave           Boolean     @default(true) @map("auto_save")
+  emailNotifications Boolean     @default(true) @map("email_notifications")
+  
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+  
+  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_settings")
+}
+
+// Content Models
+model Idea {
+  id               String      @id @default(cuid())
+  userId           String      @map("user_id")
+  rawContent       String      @map("raw_content")
+  processedContent Json?       @map("processed_content")
+  voiceUrl         String?     @map("voice_url")
+  transcription    String?
+  tags             String[]
+  contentType      ContentType @default(EDUCATIONAL) @map("content_type")
+  targetPlatform   Platform    @default(ALL) @map("target_platform")
+  status           IdeaStatus  @default(DRAFT)
+  
+  // Metadata
+  wordCount        Int?        @map("word_count")
+  estimatedDuration Float?     @map("estimated_duration") // in seconds
+  language         String      @default("en")
+  
+  createdAt        DateTime    @default(now()) @map("created_at")
+  updatedAt        DateTime    @updatedAt @map("updated_at")
+  
+  // Relations
+  user             User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  generatedContent GeneratedContent[]
+  performanceData  PerformanceData[]
+  
+  @@map("ideas")
+}
+
+model GeneratedContent {
+  id            String                 @id @default(cuid())
+  ideaId        String                 @map("idea_id")
+  userId        String                 @map("user_id")
+  contentType   GeneratedContentType   @map("content_type")
+  platform      Platform
+  content       String
+  metadata      Json                   // Stores hook type, confidence score, variations, etc.
+  
+  // Performance tracking
+  isPublished   Boolean                @default(false) @map("is_published")
+  publishedAt   DateTime?              @map("published_at")
+  
+  createdAt     DateTime               @default(now()) @map("created_at")
+  updatedAt     DateTime               @updatedAt @map("updated_at")
+  
+  // Relations
+  idea          Idea                   @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  performanceData PerformanceData[]
+  
+  @@map("generated_content")
+}
+
+model PerformanceData {
+  id                 String            @id @default(cuid())
+  userId             String            @map("user_id")
+  ideaId             String?           @map("idea_id")
+  generatedContentId String?           @map("generated_content_id")
+  platform           Platform
+  
+  // Metrics
+  views              Int               @default(0)
+  likes              Int               @default(0)
+  shares             Int               @default(0)
+  comments           Int               @default(0)
+  saves              Int               @default(0)
+  engagementRate     Float             @default(0) @map("engagement_rate")
+  completionRate     Float             @default(0) @map("completion_rate")
+  clickThroughRate   Float?            @map("click_through_rate")
+  impressions        Int?
+  
+  // Social media specific data
+  externalId         String?           @map("external_id") // Platform's post ID
+  externalUrl        String?           @map("external_url")
+  
+  // Metadata
+  recordedAt         DateTime          @default(now()) @map("recorded_at")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+  
+  // Relations
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  idea               Idea?             @relation(fields: [ideaId], references: [id], onDelete: Cascade)
+  generatedContent   GeneratedContent? @relation(fields: [generatedContentId], references: [id], onDelete: Cascade)
+  
+  @@map("performance_data")
+}
+
+// Template and Formula Models
+model Template {
+  id          String          @id @default(cuid())
+  name        String
+  category    ContentCategory
+  platform    Platform
+  contentType GeneratedContentType @map("content_type")
+  formula     String          // The template text with variables
+  variables   Json            // Variable definitions and examples
+  successRate Float           @default(0) @map("success_rate")
+  isActive    Boolean         @default(true) @map("is_active")
+  
+  // Usage tracking
+  timesUsed   Int             @default(0) @map("times_used")
+  
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  
+  @@map("templates")
+}
+
+// Analytics and Insights Models
+model UserAnalytics {
+  id                    String   @id @default(cuid())
+  userId                String   @map("user_id")
+  date                  DateTime @db.Date
+  
+  // Daily metrics
+  ideasCreated          Int      @default(0) @map("ideas_created")
+  contentGenerated      Int      @default(0) @map("content_generated")
+  totalViews            Int      @default(0) @map("total_views")
+  totalEngagement       Int      @default(0) @map("total_engagement")
+  avgEngagementRate     Float    @default(0) @map("avg_engagement_rate")
+  
+  createdAt             DateTime @default(now()) @map("created_at")
+  
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, date])
+  @@map("user_analytics")
+}
+
+// Subscription and Billing Models
+model Subscription {
+  id                    String             @id @default(cuid())
+  userId                String             @unique @map("user_id")
+  status                SubscriptionStatus
+  plan                  SubscriptionPlan   @map("plan")
+  
+  // Stripe integration
+  stripeCustomerId      String?            @unique @map("stripe_customer_id")
+  stripeSubscriptionId  String?            @unique @map("stripe_subscription_id")
+  stripePriceId         String?            @map("stripe_price_id")
+  
+  // Billing cycle
+  currentPeriodStart    DateTime?          @map("current_period_start")
+  currentPeriodEnd      DateTime?          @map("current_period_end")
+  
+  // Trial information
+  trialStart            DateTime?          @map("trial_start")
+  trialEnd              DateTime?          @map("trial_end")
+  
+  createdAt             DateTime           @default(now()) @map("created_at")
+  updatedAt             DateTime           @updatedAt @map("updated_at")
+  
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("subscriptions")
+}
+
+// Team and Collaboration Models (for Business plan)
+model Team {
+  id          String       @id @default(cuid())
+  name        String
+  slug        String       @unique
+  ownerId     String       @map("owner_id")
+  
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  
+  owner       User         @relation("TeamOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TeamMember[]
+  
+  @@map("teams")
+}
+
+model TeamMember {
+  id        String     @id @default(cuid())
+  teamId    String     @map("team_id")
+  userId    String     @map("user_id")
+  role      TeamRole   @default(MEMBER)
+  
+  joinedAt  DateTime   @default(now()) @map("joined_at")
+  
+  team      Team       @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User       @relation("TeamMembership", fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+// Enums
+enum Platform {
+  TIKTOK
+  INSTAGRAM_REELS
+  YOUTUBE_SHORTS
+  ALL
+}
+
+enum ContentType {
+  EDUCATIONAL
+  ENTERTAINMENT
+  INSPIRATIONAL
+  PROMOTIONAL
+  STORYTELLING
+  TUTORIAL
+}
+
+enum ContentTone {
+  PROFESSIONAL
+  CASUAL
+  FRIENDLY
+  AUTHORITATIVE
+  HUMOROUS
+  INSPIRING
+}
+
+enum GeneratedContentType {
+  HOOK
+  SCRIPT
+  CAPTION
+  HASHTAGS
+  CTA
+}
+
+enum IdeaStatus {
+  DRAFT
+  PROCESSING
+  COMPLETED
+  ARCHIVED
+}
+
+enum SubscriptionStatus {
+  FREE_TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  TRIALING
+  UNPAID
+}
+
+enum SubscriptionPlan {
+  FREE_TRIAL
+  STARTER
+  PROFESSIONAL
+  BUSINESS
+}
+
+enum ContentCategory {
+  BUSINESS
+  LIFESTYLE
+  EDUCATION
+  ENTERTAINMENT
+  FITNESS
+  FOOD
+  TRAVEL
+  TECHNOLOGY
+  FASHION
+  OTHER
+}
+
+enum TeamRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
