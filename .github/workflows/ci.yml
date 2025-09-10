@@ -28,25 +28,20 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Rebuild native dependencies
+        run: npm rebuild --workspace=apps/web
+
       - name: Lint check
-        run: |
-          cd apps/web
-          npm run lint
+        run: npm run lint --workspace=apps/web
 
       - name: Type check
-        run: |
-          cd apps/web
-          npm run type-check
+        run: npm run type-check --workspace=apps/web
 
       - name: Format check
-        run: |
-          cd apps/web
-          npm run format:check
+        run: npm run format:check --workspace=apps/web
 
       - name: Build application
-        run: |
-          cd apps/web
-          npm run build
+        run: npm run build --workspace=apps/web
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           DIRECT_URL: ${{ secrets.DIRECT_URL }}
@@ -83,10 +78,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Rebuild native dependencies
+        run: npm rebuild --workspace=apps/web
+
       - name: Run security audit
-        run: |
-          cd apps/web
-          npm audit --audit-level=moderate
+        run: npm audit --audit-level=moderate --workspace=apps/web
 
   # Deploy to Vercel (only on main branch)
   deploy-vercel:
