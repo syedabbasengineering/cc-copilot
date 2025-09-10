@@ -6,13 +6,13 @@ export const dbConfig = {
   connectionPool: {
     // Maximum number of connections in the pool
     max: parseInt(process.env.DB_POOL_MAX || '20'),
-    
+
     // Minimum number of connections to maintain
     min: parseInt(process.env.DB_POOL_MIN || '2'),
-    
+
     // Connection timeout in milliseconds
     connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT || '10000'),
-    
+
     // Idle timeout in milliseconds
     idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000'),
   },
@@ -21,10 +21,10 @@ export const dbConfig = {
   queryTimeout: {
     // Default query timeout in milliseconds
     default: parseInt(process.env.DB_QUERY_TIMEOUT || '60000'),
-    
+
     // Long-running query timeout (for reports, analytics)
     longRunning: parseInt(process.env.DB_LONG_QUERY_TIMEOUT || '300000'),
-    
+
     // Short query timeout (for quick lookups)
     short: parseInt(process.env.DB_SHORT_QUERY_TIMEOUT || '5000'),
   },
@@ -40,20 +40,23 @@ export const dbConfig = {
   connection: {
     url: env.DATABASE_URL,
     directUrl: env.DIRECT_URL,
-    
+
     // SSL configuration
-    ssl: process.env.NODE_ENV === 'production' ? {
-      rejectUnauthorized: false,
-    } : false,
-    
+    ssl:
+      process.env.NODE_ENV === 'production'
+        ? {
+            rejectUnauthorized: false,
+          }
+        : false,
+
     // Additional connection options
     options: {
       // Enable connection pooling
       pgbouncer: process.env.PGBOUNCER_ENABLED === 'true',
-      
+
       // Connection pool mode for PgBouncer
       poolMode: process.env.PGBOUNCER_POOL_MODE || 'transaction',
-      
+
       // Schema to use
       schema: process.env.DB_SCHEMA || 'public',
     },
@@ -101,31 +104,31 @@ export class DatabasePerformance {
 
   static startQuery(queryId: string): () => void {
     const startTime = Date.now();
-    
+
     return () => {
       const duration = Date.now() - startTime;
-      
+
       if (!this.queryTimes.has(queryId)) {
         this.queryTimes.set(queryId, []);
       }
-      
+
       const times = this.queryTimes.get(queryId)!;
       times.push(duration);
-      
+
       // Keep only last 100 measurements
       if (times.length > 100) {
         times.shift();
       }
-      
+
       // Log slow queries
       if (duration > dbConfig.queryTimeout.default / 2) {
         console.warn(`🐌 Slow query detected: ${queryId} took ${duration}ms`);
-        
+
         ConnectionPoolMonitor.getInstance().updateMetrics({
           slowQueries: ConnectionPoolMonitor.getInstance().getMetrics().slowQueries + 1,
         });
       }
-      
+
       // Update average response time
       const avgTime = times.reduce((sum, time) => sum + time, 0) / times.length;
       ConnectionPoolMonitor.getInstance().updateMetrics({
@@ -176,7 +179,7 @@ export const getPoolConfig = () => {
         idleTimeout: 30000,
         acquireTimeout: 10000,
       };
-    
+
     case 'development':
       return {
         ...baseConfig,
@@ -184,7 +187,7 @@ export const getPoolConfig = () => {
         idleTimeout: 10000,
         acquireTimeout: 5000,
       };
-    
+
     case 'test':
       return {
         ...baseConfig,
@@ -192,7 +195,7 @@ export const getPoolConfig = () => {
         idleTimeout: 1000,
         acquireTimeout: 2000,
       };
-    
+
     default:
       return baseConfig;
   }
@@ -204,7 +207,7 @@ export const getDatabaseUrl = () => {
   if (process.env.NODE_ENV === 'development' || process.env.PRISMA_CLI_BINARY_TARGETS) {
     return env.DIRECT_URL || env.DATABASE_URL;
   }
-  
+
   // Use pooled connection for production
   return env.DATABASE_URL;
 };
@@ -213,13 +216,13 @@ export const getDatabaseUrl = () => {
 export const healthCheckConfig = {
   // How often to run health checks (milliseconds)
   interval: parseInt(process.env.DB_HEALTH_CHECK_INTERVAL || '30000'),
-  
+
   // Timeout for health check queries
   timeout: parseInt(process.env.DB_HEALTH_CHECK_TIMEOUT || '5000'),
-  
+
   // Number of failed checks before marking as unhealthy
   failureThreshold: parseInt(process.env.DB_HEALTH_CHECK_FAILURES || '3'),
-  
+
   // Number of successful checks to mark as healthy again
   successThreshold: parseInt(process.env.DB_HEALTH_CHECK_SUCCESS || '2'),
 };

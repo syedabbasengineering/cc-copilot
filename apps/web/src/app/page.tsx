@@ -1,9 +1,11 @@
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
+import { auth } from '@clerk/nextjs/server';
+
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { auth } from '@clerk/nextjs/server';
-import { redirect } from 'next/navigation';
-import Link from 'next/link';
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic';
@@ -81,9 +83,7 @@ export default async function HomePage() {
                 <span className="text-2xl">📊</span>
                 Performance Tracking
               </CardTitle>
-              <CardDescription>
-                Track performance and get repurposing suggestions
-              </CardDescription>
+              <CardDescription>Track performance and get repurposing suggestions</CardDescription>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">

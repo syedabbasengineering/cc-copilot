@@ -1,4 +1,4 @@
-import { Platform, ContentType, ContentTone, HookType } from '@/types';
+import { ContentTone, ContentType, HookType, Platform } from '@/types';
 
 // Platform Configuration
 export const PLATFORM_CONFIG = {
@@ -86,22 +86,30 @@ export const HOOK_TYPE_CONFIG = {
   [HookType.STATISTIC]: {
     name: 'Statistic/Fact',
     description: 'Start with a surprising statistic or fact',
-    examples: ['95% of people don\'t know this', 'In just 30 seconds...', 'Studies show that...'],
+    examples: ["95% of people don't know this", 'In just 30 seconds...', 'Studies show that...'],
   },
   [HookType.STORY]: {
     name: 'Story',
     description: 'Begin with a personal story or anecdote',
-    examples: ['Last week, something crazy happened', 'I used to think...', 'My biggest mistake was...'],
+    examples: [
+      'Last week, something crazy happened',
+      'I used to think...',
+      'My biggest mistake was...',
+    ],
   },
   [HookType.CONTROVERSIAL]: {
     name: 'Controversial',
     description: 'Start with a controversial or contrarian take',
-    examples: ['Unpopular opinion:', 'Everyone\'s doing this wrong', 'This is why I disagree...'],
+    examples: ['Unpopular opinion:', "Everyone's doing this wrong", 'This is why I disagree...'],
   },
   [HookType.PROMISE]: {
     name: 'Promise/Benefit',
     description: 'Promise a specific benefit or outcome',
-    examples: ['By the end of this video...', 'This will save you hours', 'In 60 seconds, you\'ll learn...'],
+    examples: [
+      'By the end of this video...',
+      'This will save you hours',
+      "In 60 seconds, you'll learn...",
+    ],
   },
 } as const;
 
@@ -206,19 +214,19 @@ export const CTA_TEMPLATES = {
     'Let me know what you think in the comments!',
     'Which one would you choose? Comment below!',
     'Tag someone who needs to see this!',
-    'What\'s your experience with this? Share below!',
+    "What's your experience with this? Share below!",
   ],
   follow: [
     'Follow for more content like this!',
     'Hit that follow button if this helped you!',
-    'Don\'t miss out - follow for daily tips!',
+    "Don't miss out - follow for daily tips!",
     'Follow me for more insider secrets!',
   ],
   save: [
     'Save this for later!',
     'Bookmark this post for when you need it!',
-    'Save this - you\'ll thank me later!',
-    'Don\'t lose this - hit save now!',
+    "Save this - you'll thank me later!",
+    "Don't lose this - hit save now!",
   ],
   share: [
     'Share this with someone who needs to hear it!',

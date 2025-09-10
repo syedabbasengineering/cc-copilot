@@ -1,5 +1,6 @@
-import { SignUp } from '@clerk/nextjs';
 import Link from 'next/link';
+
+import { SignUp } from '@clerk/nextjs';
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic';
@@ -12,15 +13,13 @@ export default function SignUpPage() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
             Get Started Free
           </h1>
-          <p className="text-gray-600">
-            Create your account and start building viral content
-          </p>
+          <p className="text-gray-600">Create your account and start building viral content</p>
         </div>
-        
-        <SignUp 
+
+        <SignUp
           appearance={{
             elements: {
-              formButtonPrimary: 
+              formButtonPrimary:
                 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700',
               card: 'shadow-xl border-0',
               headerTitle: 'hidden',
@@ -29,7 +28,7 @@ export default function SignUpPage() {
           }}
           redirectUrl="/dashboard"
         />
-        
+
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500">
             Already have an account?{' '}

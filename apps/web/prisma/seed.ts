@@ -1,13 +1,13 @@
 import { PrismaClient } from '@prisma/client';
 import {
-  Platform,
-  ContentType,
+  ContentCategory,
   ContentTone,
+  ContentType,
   GeneratedContentType,
   IdeaStatus,
-  SubscriptionStatus,
+  Platform,
   SubscriptionPlan,
-  ContentCategory,
+  SubscriptionStatus,
   TeamRole,
 } from '@prisma/client';
 
@@ -17,12 +17,13 @@ const sampleUsers = [
   {
     email: 'john@example.com',
     name: 'John Creator',
-    brandVoice: 'Professional yet approachable. Focus on educational content with clear, actionable insights.',
+    brandVoice:
+      'Professional yet approachable. Focus on educational content with clear, actionable insights.',
     preferredPlatforms: [Platform.TIKTOK, Platform.INSTAGRAM_REELS],
     subscriptionStatus: SubscriptionStatus.ACTIVE,
   },
   {
-    email: 'sarah@example.com', 
+    email: 'sarah@example.com',
     name: 'Sarah Influencer',
     brandVoice: 'Fun, energetic, and relatable. Love using humor and personal stories to connect.',
     preferredPlatforms: [Platform.YOUTUBE_SHORTS, Platform.INSTAGRAM_REELS],
@@ -73,11 +74,11 @@ const sampleIdeas = [
 ];
 
 const sampleHooks = [
-  "Did you know that 90% of entrepreneurs waste 3 hours daily on these productivity mistakes?",
+  'Did you know that 90% of entrepreneurs waste 3 hours daily on these productivity mistakes?',
   "I tried this morning routine for 30 days and here's what happened...",
   "Stop doing social media marketing wrong! Here's what actually works:",
   "Working from home be like... (you'll definitely relate to #3)",
-  "This one productivity hack saved me 15 hours per week",
+  'This one productivity hack saved me 15 hours per week',
 ];
 
 const sampleScripts = [
@@ -122,7 +123,8 @@ const sampleTemplates = [
     category: ContentCategory.LIFESTYLE,
     platform: Platform.INSTAGRAM_REELS,
     contentType: GeneratedContentType.SCRIPT,
-    formula: 'I tried {activity} for {duration} and here\'s what happened... Day 1-{period1}: {early_results}. Day {period2}: {major_change}. Day {final_period}: {final_outcome}.',
+    formula:
+      "I tried {activity} for {duration} and here's what happened... Day 1-{period1}: {early_results}. Day {period2}: {major_change}. Day {final_period}: {final_outcome}.",
     variables: {
       activity: 'this morning routine, cold showers, meditation, journaling',
       duration: '30 days, 60 days, 90 days, 6 months',
@@ -137,11 +139,12 @@ const sampleTemplates = [
     category: ContentCategory.BUSINESS,
     platform: Platform.ALL,
     contentType: GeneratedContentType.SCRIPT,
-    formula: 'Stop {wrong_approach}! Here\'s what actually works: {solution_1}, {solution_2}, {solution_3}. Try this instead: {actionable_step}.',
+    formula:
+      "Stop {wrong_approach}! Here's what actually works: {solution_1}, {solution_2}, {solution_3}. Try this instead: {actionable_step}.",
     variables: {
       wrong_approach: 'posting randomly, copying competitors, chasing trends, ignoring analytics',
       solution_1: 'focus on your audience, create original content, stay consistent',
-      solution_2: 'engage authentically, provide value, solve real problems', 
+      solution_2: 'engage authentically, provide value, solve real problems',
       solution_3: 'measure what matters, iterate based on data, build community',
     },
     successRate: 0.84,
@@ -182,15 +185,18 @@ async function main() {
         subscription: {
           create: {
             status: userData.subscriptionStatus,
-            plan: userData.subscriptionStatus === SubscriptionStatus.FREE_TRIAL 
-              ? SubscriptionPlan.FREE_TRIAL 
-              : SubscriptionPlan.PROFESSIONAL,
-            trialStart: userData.subscriptionStatus === SubscriptionStatus.FREE_TRIAL 
-              ? new Date() 
-              : undefined,
-            trialEnd: userData.subscriptionStatus === SubscriptionStatus.FREE_TRIAL 
-              ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) 
-              : undefined,
+            plan:
+              userData.subscriptionStatus === SubscriptionStatus.FREE_TRIAL
+                ? SubscriptionPlan.FREE_TRIAL
+                : SubscriptionPlan.PROFESSIONAL,
+            trialStart:
+              userData.subscriptionStatus === SubscriptionStatus.FREE_TRIAL
+                ? new Date()
+                : undefined,
+            trialEnd:
+              userData.subscriptionStatus === SubscriptionStatus.FREE_TRIAL
+                ? new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+                : undefined,
           },
         },
       },
@@ -207,7 +213,7 @@ async function main() {
   let ideaCount = 0;
   for (let i = 0; i < createdUsers.length; i++) {
     const user = createdUsers[i];
-    
+
     // Create 2-3 ideas per user
     for (let j = 0; j < sampleIdeas.length; j++) {
       if (j % createdUsers.length === i) {
@@ -322,7 +328,7 @@ async function main() {
   console.log(`📊 Created analytics data for ${createdUsers.length} users over 30 days`);
 
   // Create a team for business user
-  const businessUser = createdUsers.find(u => u.email === 'mike@business.com');
+  const businessUser = createdUsers.find((u) => u.email === 'mike@business.com');
   if (businessUser) {
     const team = await prisma.team.create({
       data: {
@@ -348,13 +354,13 @@ async function main() {
   }
 
   console.log('✅ Database seeding completed successfully!');
-  
+
   // Print summary
   const userCount = await prisma.user.count();
   const ideaCount2 = await prisma.idea.count();
   const contentCount = await prisma.generatedContent.count();
   const templateCount = await prisma.template.count();
-  
+
   console.log('\n📈 Seeding Summary:');
   console.log(`   Users: ${userCount}`);
   console.log(`   Ideas: ${ideaCount2}`);

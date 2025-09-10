@@ -1,9 +1,11 @@
-import { getCurrentUser, checkSubscriptionLimits } from '@/lib/auth';
-import { UserButton } from '@clerk/nextjs';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { redirect } from 'next/navigation';
+
+import { UserButton } from '@clerk/nextjs';
+
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { checkSubscriptionLimits, getCurrentUser } from '@/lib/auth';
 
 // Force dynamic rendering for this page
 export const dynamic = 'force-dynamic';
@@ -32,9 +34,7 @@ export default async function DashboardPage() {
               </Badge>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
-                Welcome, {user.name || user.email}
-              </span>
+              <span className="text-sm text-gray-600">Welcome, {user.name || user.email}</span>
               <UserButton afterSignOutUrl="/" />
             </div>
           </div>
@@ -45,9 +45,7 @@ export default async function DashboardPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h2>
-          <p className="text-gray-600">
-            Welcome to your AI-powered content creation workspace
-          </p>
+          <p className="text-gray-600">Welcome to your AI-powered content creation workspace</p>
         </div>
 
         {/* Quick Stats */}
@@ -58,9 +56,7 @@ export default async function DashboardPage() {
               <CardTitle className="text-2xl">
                 {limits.ideas.used}
                 {limits.ideas.limit !== Infinity && (
-                  <span className="text-sm font-normal text-gray-500">
-                    / {limits.ideas.limit}
-                  </span>
+                  <span className="text-sm font-normal text-gray-500">/ {limits.ideas.limit}</span>
                 )}
               </CardTitle>
             </CardHeader>
@@ -84,7 +80,7 @@ export default async function DashboardPage() {
             <CardHeader className="pb-2">
               <CardDescription>Subscription Status</CardDescription>
               <CardTitle className="text-lg">
-                <Badge 
+                <Badge
                   variant={user.subscription?.status === 'ACTIVE' ? 'default' : 'secondary'}
                   className="text-xs"
                 >
@@ -98,10 +94,15 @@ export default async function DashboardPage() {
             <CardHeader className="pb-2">
               <CardDescription>Trial Days Left</CardDescription>
               <CardTitle className="text-2xl">
-                {user.subscription?.trialEnd 
-                  ? Math.max(0, Math.ceil((new Date(user.subscription.trialEnd).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-                  : 'N/A'
-                }
+                {user.subscription?.trialEnd
+                  ? Math.max(
+                      0,
+                      Math.ceil(
+                        (new Date(user.subscription.trialEnd).getTime() - Date.now()) /
+                          (1000 * 60 * 60 * 24)
+                      )
+                    )
+                  : 'N/A'}
               </CardTitle>
             </CardHeader>
           </Card>
@@ -115,14 +116,10 @@ export default async function DashboardPage() {
                 <span className="text-2xl">💡</span>
                 Capture New Idea
               </CardTitle>
-              <CardDescription>
-                Transform your raw ideas into structured content
-              </CardDescription>
+              <CardDescription>Transform your raw ideas into structured content</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button className="w-full">
-                Create Idea
-              </Button>
+              <Button className="w-full">Create Idea</Button>
             </CardContent>
           </Card>
 
@@ -132,9 +129,7 @@ export default async function DashboardPage() {
                 <span className="text-2xl">⚡</span>
                 AI Generator
               </CardTitle>
-              <CardDescription>
-                Generate hooks, scripts, and captions instantly
-              </CardDescription>
+              <CardDescription>Generate hooks, scripts, and captions instantly</CardDescription>
             </CardHeader>
             <CardContent>
               <Button className="w-full" variant="outline">
@@ -149,9 +144,7 @@ export default async function DashboardPage() {
                 <span className="text-2xl">📚</span>
                 Content Library
               </CardTitle>
-              <CardDescription>
-                Browse and manage your generated content
-              </CardDescription>
+              <CardDescription>Browse and manage your generated content</CardDescription>
             </CardHeader>
             <CardContent>
               <Button className="w-full" variant="outline">
@@ -165,9 +158,7 @@ export default async function DashboardPage() {
         <Card>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>
-              Your latest content creation activity
-            </CardDescription>
+            <CardDescription>Your latest content creation activity</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="text-center py-8 text-gray-500">

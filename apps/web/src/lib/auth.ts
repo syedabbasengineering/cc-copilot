@@ -1,7 +1,9 @@
-import { auth, currentUser } from '@clerk/nextjs/server';
-import { prisma } from '@/lib/db';
-import { User, Subscription, UserSettings } from '@prisma/client';
 import { redirect } from 'next/navigation';
+
+import { auth, currentUser } from '@clerk/nextjs/server';
+import { Subscription, User, UserSettings } from '@prisma/client';
+
+import { prisma } from '@/lib/db';
 
 // Types for user data
 export type UserWithSubscription = User & {
@@ -13,7 +15,7 @@ export type UserWithSubscription = User & {
 export async function getCurrentUser(): Promise<UserWithSubscription | null> {
   try {
     const clerkUser = await currentUser();
-    
+
     if (!clerkUser) {
       return null;
     }
@@ -37,18 +39,18 @@ export async function getCurrentUser(): Promise<UserWithSubscription | null> {
 // Get current user ID (throws if not authenticated)
 export async function requireAuth(): Promise<string> {
   const { userId } = await auth();
-  
+
   if (!userId) {
     redirect('/sign-in');
   }
-  
+
   return userId;
 }
 
 // Get current user with subscription check
 export async function requireUserWithSubscription(): Promise<UserWithSubscription> {
   const userId = await requireAuth();
-  
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
@@ -136,9 +138,8 @@ export function checkSubscriptionLimits(user: UserWithSubscription) {
   // Reset monthly counters if it's a new month
   const now = new Date();
   const lastReset = new Date(lastResetAt);
-  const shouldReset = 
-    now.getMonth() !== lastReset.getMonth() || 
-    now.getFullYear() !== lastReset.getFullYear();
+  const shouldReset =
+    now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear();
 
   if (shouldReset) {
     // Reset counters (this would typically be done via a separate cron job)
@@ -198,9 +199,10 @@ export async function incrementUserUsage(
   userId: string,
   type: 'ideas' | 'generations'
 ): Promise<void> {
-  const updateData = type === 'ideas' 
-    ? { monthlyIdeas: { increment: 1 } }
-    : { monthlyGenerations: { increment: 1 } };
+  const updateData =
+    type === 'ideas'
+      ? { monthlyIdeas: { increment: 1 } }
+      : { monthlyGenerations: { increment: 1 } };
 
   await prisma.user.update({
     where: { id: userId },
@@ -214,11 +216,11 @@ export async function canPerformAction(
   action: 'create_idea' | 'generate_content'
 ): Promise<{ allowed: boolean; reason?: string }> {
   const user = await requireUserWithSubscription();
-  
+
   if (!hasValidSubscription(user)) {
-    return { 
-      allowed: false, 
-      reason: 'Subscription expired. Please upgrade to continue.' 
+    return {
+      allowed: false,
+      reason: 'Subscription expired. Please upgrade to continue.',
     };
   }
 
@@ -228,19 +230,19 @@ export async function canPerformAction(
     case 'create_idea':
       return {
         allowed: limits.ideas.canCreate,
-        reason: limits.ideas.canCreate 
-          ? undefined 
+        reason: limits.ideas.canCreate
+          ? undefined
           : 'Monthly idea limit reached. Upgrade for unlimited ideas.',
       };
-    
+
     case 'generate_content':
       return {
         allowed: limits.generations.canGenerate,
-        reason: limits.generations.canGenerate 
-          ? undefined 
+        reason: limits.generations.canGenerate
+          ? undefined
           : 'Monthly generation limit reached. Upgrade for unlimited generations.',
       };
-    
+
     default:
       return { allowed: false, reason: 'Unknown action' };
   }

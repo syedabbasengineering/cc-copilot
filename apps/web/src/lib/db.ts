@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+
 import { dbConfig } from './db-config';
 
 declare global {
@@ -9,13 +10,14 @@ declare global {
 const createPrismaClient = () => {
   return new PrismaClient({
     // Logging configuration
-    log: process.env.NODE_ENV === 'development' 
-      ? ['query', 'info', 'warn', 'error']
-      : ['warn', 'error'],
-    
+    log:
+      process.env.NODE_ENV === 'development'
+        ? ['query', 'info', 'warn', 'error']
+        : ['warn', 'error'],
+
     // Error formatting
     errorFormat: 'pretty',
-    
+
     datasources: {
       db: {
         url: dbConfig.connection.url,
@@ -63,17 +65,22 @@ export async function dbHealthCheck() {
     return { status: 'healthy', timestamp: new Date().toISOString() };
   } catch (error) {
     console.error('❌ Database health check failed:', error);
-    return { 
-      status: 'unhealthy', 
+    return {
+      status: 'unhealthy',
       error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString() 
+      timestamp: new Date().toISOString(),
     };
   }
 }
 
 // Transaction wrapper
 export async function withTransaction<T>(
-  callback: (tx: Omit<PrismaClient, "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends">) => Promise<T>
+  callback: (
+    tx: Omit<
+      PrismaClient,
+      '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
+    >
+  ) => Promise<T>
 ): Promise<T> {
   return prisma.$transaction(callback);
 }
@@ -81,7 +88,7 @@ export async function withTransaction<T>(
 // Common query helpers
 export const queries = {
   // User queries
-  getUserById: (id: string) => 
+  getUserById: (id: string) =>
     prisma.user.findUnique({
       where: { id },
       include: {
@@ -116,7 +123,7 @@ export const queries = {
   getUserAnalytics: (userId: string, days = 30) => {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
-    
+
     return prisma.userAnalytics.findMany({
       where: {
         userId,

@@ -1,8 +1,10 @@
-import { Webhook } from 'svix';
 import { headers } from 'next/headers';
+
 import { WebhookEvent } from '@clerk/nextjs/server';
+import { ContentTone, SubscriptionPlan, SubscriptionStatus } from '@prisma/client';
+import { Webhook } from 'svix';
+
 import { prisma } from '@/lib/db';
-import { SubscriptionStatus, SubscriptionPlan, ContentTone } from '@prisma/client';
 
 export async function POST(req: Request) {
   // Get the headers
@@ -49,15 +51,15 @@ export async function POST(req: Request) {
       case 'user.created':
         await handleUserCreated(evt);
         break;
-      
+
       case 'user.updated':
         await handleUserUpdated(evt);
         break;
-      
+
       case 'user.deleted':
         await handleUserDeleted(evt);
         break;
-      
+
       default:
         console.log(`Unhandled event type: ${eventType}`);
     }
@@ -77,7 +79,7 @@ async function handleUserCreated(evt: WebhookEvent) {
     last_name?: string;
   };
   const { id, email_addresses, first_name, last_name } = data;
-  
+
   if (!email_addresses || email_addresses.length === 0) {
     throw new Error('No email address found for user');
   }
@@ -124,7 +126,7 @@ async function handleUserUpdated(evt: WebhookEvent) {
     last_name?: string;
   };
   const { id, email_addresses, first_name, last_name } = data;
-  
+
   if (!email_addresses || email_addresses.length === 0) {
     console.warn('No email address found for user update');
     return;
