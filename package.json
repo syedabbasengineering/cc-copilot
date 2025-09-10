@@ -1,0 +1,38 @@
+{
+  "name": "cc-copilot",
+  "version": "1.0.0",
+  "description": "AI-Powered Short-Form Video Content Creator",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=apps/web",
+    "build": "npm run build --workspace=apps/web",
+    "start": "npm run start --workspace=apps/web",
+    "lint": "npm run lint --workspaces",
+    "format": "npm run format --workspaces",
+    "type-check": "npm run type-check --workspaces"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2",
+    "eslint": "^9"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "keywords": [
+    "ai",
+    "content-creation",
+    "social-media",
+    "nextjs",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/cc-copilot.git"
+  },
+  "license": "MIT"
+}
