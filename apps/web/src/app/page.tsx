@@ -1,8 +1,16 @@
 import { MainLayout } from '@/components/layout/main-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { auth } from '@clerk/nextjs/server';
+import { redirect } from 'next/navigation';
+import Link from 'next/link';
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Redirect authenticated users to dashboard
+  const { userId } = await auth();
+  if (userId) {
+    redirect('/dashboard');
+  }
   return (
     <MainLayout>
       <div className="flex flex-col items-center justify-center min-h-[80vh] text-center space-y-8">
@@ -17,12 +25,16 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button size="lg" className="px-8">
-            Get Started Free
-          </Button>
-          <Button size="lg" variant="outline" className="px-8">
-            Watch Demo
-          </Button>
+          <Link href="/sign-up">
+            <Button size="lg" className="px-8">
+              Get Started Free
+            </Button>
+          </Link>
+          <Link href="/sign-in">
+            <Button size="lg" variant="outline" className="px-8">
+              Sign In
+            </Button>
+          </Link>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mt-16 max-w-4xl">

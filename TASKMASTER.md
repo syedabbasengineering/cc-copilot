@@ -15,8 +15,8 @@
 - [x] Configure ESLint, Prettier, and Husky pre-commit hooks [done]
 - [x] Setup environment variables structure [done]
 - [x] Create project file structure as per PRD [done]
-- [ ] Initialize Git repository and setup branch protection rules [pending]
-- [ ] Setup Vercel deployment pipeline [pending]
+- [x] Initialize Git repository and setup branch protection rules [done]
+- [x] Setup Vercel deployment pipeline [done]
 
 ### 2. DATABASE & AUTHENTICATION [pending]
 #### 2.1 Database Setup [pending]
